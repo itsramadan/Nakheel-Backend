@@ -1,0 +1,1006 @@
+{
+  "info": {
+    "name": "Nakheel API",
+    "_postman_id": "b7e2f0a0-1b1a-4e7a-9b7a-nakheel00001",
+    "description": "حقل النخيل - Backend API (Laravel 13 / Sanctum). Base URL و Token متسجلين كـ collection variables، وطلب verify-otp بيحفظ التوكن أوتوماتيك.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://nakheel-backend.test/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "client_id",
+      "value": "1"
+    },
+    {
+      "key": "farm_id",
+      "value": "1"
+    },
+    {
+      "key": "task_id",
+      "value": "1"
+    },
+    {
+      "key": "visit_id",
+      "value": "1"
+    },
+    {
+      "key": "notification_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Request OTP",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"01011122233\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/otp/request",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "otp",
+                "request"
+              ]
+            },
+            "description": "أرقام تجريبية: مهندس 01000000000 - مزارع بمزرعة واحدة 01011122233 - مزارع بأكتر من مزرعة 01044455566"
+          }
+        },
+        {
+          "name": "Verify OTP",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const data = pm.response.json();",
+                  "    pm.collectionVariables.set('token', data.token);",
+                  "    console.log('role:', data.role);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"01011122233\",\n  \"code\": \"1111\",\n  \"fcm_token\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/otp/verify",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "otp",
+                "verify"
+              ]
+            },
+            "description": "كود التفعيل ثابت 1111 دلوقتي. بيحفظ التوكن أوتوماتيك في collection variable 'token' عشان باقي الـ requests تستخدمه."
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update FCM Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fcm_token\": \"the-new-fcm-token\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/fcm-token",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "fcm-token"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "List Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/notifications",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "notifications"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mark All Read",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/notifications/read-all",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "notifications",
+                "read-all"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mark One Read",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/notifications/{{notification_id}}/read",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "notifications",
+                "{{notification_id}}",
+                "read"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Engineer",
+      "item": [
+        {
+          "name": "Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/engineer/dashboard",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "engineer",
+                "dashboard"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Clients - List",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/engineer/clients",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "engineer",
+                "clients"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Clients - Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"سعيد المطيري\",\n  \"phone\": \"01055566677\",\n  \"city\": \"القليوبية\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/engineer/clients",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "engineer",
+                "clients"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Clients - Show",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/engineer/clients/{{client_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "engineer",
+                "clients",
+                "{{client_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Farms - Create for Client",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"مزرعة الأمل\",\n  \"location\": \"طريق الفيوم الصحراوي\",\n  \"area\": 30,\n  \"variety_type\": \"مجدول\",\n  \"palm_count\": 200,\n  \"palm_age_years\": 10,\n  \"planted_at\": \"2016-03-01\",\n  \"soil_type\": \"رملية\",\n  \"water_source\": \"بئر ارتوازي\",\n  \"water_analysis\": \"نسبة الأملاح ٦٠٠ جزء في المليون - ملوحة منخفضة.\",\n  \"general_notes\": \"الأرض مستوية وسهلة الوصول لكل الأشجار.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/engineer/clients/{{client_id}}/farms",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "engineer",
+                "clients",
+                "{{client_id}}",
+                "farms"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Farms - Show",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/engineer/farms/{{farm_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "engineer",
+                "farms",
+                "{{farm_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Farms - Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"palm_count\": 330,\n  \"subscription_next_payment_date\": \"2026-10-01\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/engineer/farms/{{farm_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "engineer",
+                "farms",
+                "{{farm_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Tasks - List",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/engineer/tasks?status=all",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "engineer",
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "farm_id",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "category",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "all"
+                }
+              ]
+            },
+            "description": "status: all | approved | pending | late"
+          }
+        },
+        {
+          "name": "Tasks - Create for Farm",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"irrigation\",\n  \"title\": \"ري الأشجار بعد التسميد\",\n  \"description\": \"ري غزير خلال ٢٤ ساعة من التسميد\",\n  \"due_date\": \"2026-09-05\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/engineer/farms/{{farm_id}}/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "engineer",
+                "farms",
+                "{{farm_id}}",
+                "tasks"
+              ]
+            },
+            "description": "category: irrigation | fertilizing | spraying | agricultural_operations"
+          }
+        },
+        {
+          "name": "Tasks - Show (Review)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/engineer/tasks/{{task_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "engineer",
+                "tasks",
+                "{{task_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Tasks - Approve",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/engineer/tasks/{{task_id}}/approve",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "engineer",
+                "tasks",
+                "{{task_id}}",
+                "approve"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Tasks - Reject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"review_note\": \"الصورة مش واضحة، من فضلك ارفع صورة أقرب.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/engineer/tasks/{{task_id}}/reject",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "engineer",
+                "tasks",
+                "{{task_id}}",
+                "reject"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Visits - List",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/engineer/visits?status=all",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "engineer",
+                "visits"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "all"
+                },
+                {
+                  "key": "farm_id",
+                  "value": "{{farm_id}}",
+                  "disabled": true
+                },
+                {
+                  "key": "client_id",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Visits - Show",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/engineer/visits/{{visit_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "engineer",
+                "visits",
+                "{{visit_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Visits - Schedule for Farm",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"زيارة متابعة\",\n  \"scheduled_date\": \"2026-09-10\",\n  \"notes\": \"متابعة نتيجة الفحص اللي فات.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/engineer/farms/{{farm_id}}/visits",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "engineer",
+                "farms",
+                "{{farm_id}}",
+                "visits"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Visits - Complete",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"report_note\": \"تم تقليم السعف الجاف ولم يتم رصد أي إصابات جديدة.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/engineer/visits/{{visit_id}}/complete",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "engineer",
+                "visits",
+                "{{visit_id}}",
+                "complete"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Visits - Cancel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/engineer/visits/{{visit_id}}/cancel",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "engineer",
+                "visits",
+                "{{visit_id}}",
+                "cancel"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Farmer",
+      "item": [
+        {
+          "name": "Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/farmer/dashboard",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "farmer",
+                "dashboard"
+              ]
+            }
+          }
+        },
+        {
+          "name": "My Farms",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/farmer/farms",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "farmer",
+                "farms"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Farm - Show",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/farmer/farms/{{farm_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "farmer",
+                "farms",
+                "{{farm_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Visit - Show",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/farmer/visits/{{visit_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "farmer",
+                "visits",
+                "{{visit_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "My Tasks - All Farms",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/farmer/tasks?status=all",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "farmer",
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "all"
+                },
+                {
+                  "key": "farm_id",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "category",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Farm Tasks - List",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/farmer/farms/{{farm_id}}/tasks?status=all",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "farmer",
+                "farms",
+                "{{farm_id}}",
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "all"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Task - Show",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/farmer/tasks/{{task_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "farmer",
+                "tasks",
+                "{{task_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Task - Submit Evidence",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "note",
+                  "value": "تم تنفيذ المطلوب وتصوير الشجرة قبل وبعد.",
+                  "type": "text"
+                },
+                {
+                  "key": "media[]",
+                  "type": "file",
+                  "src": [],
+                  "disabled": true
+                },
+                {
+                  "key": "media[]",
+                  "type": "file",
+                  "src": [],
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/farmer/tasks/{{task_id}}/submissions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "farmer",
+                "tasks",
+                "{{task_id}}",
+                "submissions"
+              ]
+            },
+            "description": "فعّل حقول media[] واختار ملف/أكتر (صورة أو فيديو) قبل الإرسال."
+          }
+        }
+      ]
+    }
+  ]
+}
