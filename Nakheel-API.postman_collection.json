@@ -162,10 +162,6 @@
             "method": "POST",
             "header": [
               {
-                "key": "Accept",
-                "value": "application/json"
-              },
-              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
@@ -184,7 +180,8 @@
                 "fcm-token"
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Logout",

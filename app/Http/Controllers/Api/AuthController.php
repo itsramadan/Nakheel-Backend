@@ -45,7 +45,8 @@ class AuthController extends Controller
      * خطوة ٢: تأكيد الكود، وإرجاع Bearer token + نوع الحساب.
      * `fcm_token` اختياري - لو الموبايل بعته هنا بنسجّله على طول (أسهل من
      * عمل ريكوست تاني فورًا بعد الدخول)، وبرضو ممكن يتحدّث لاحقًا عن طريق
-     * `POST /auth/fcm-token`.
+     * `POST /auth/fcm-token` (مهم لأن توكن الـ FCM بيتجدد لوحده أحيانًا من
+     * غير ما المستخدم يعمل تسجيل دخول جديد).
      */
     public function verifyOtp(VerifyOtpRequest $request): JsonResponse
     {

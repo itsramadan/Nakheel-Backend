@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'firebase' => [
+        // مسار ملف service account JSON بتاع Firebase Admin SDK (لإرسال
+        // push notifications عن طريق FCM). الافتراضي بيشاور على
+        // storage/app/firebase/firebase-credentials.json - الملف ده
+        // متجاهل في .gitignore عمدًا (سري، مينفعش يتسجل في git).
+        'credentials' => env('FIREBASE_CREDENTIALS', storage_path('app/firebase/firebase-credentials.json')),
+    ],
+
 ];

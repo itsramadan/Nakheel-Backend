@@ -9,6 +9,7 @@ use App\Http\Requests\Engineer\StoreVisitRequest;
 use App\Http\Resources\VisitResource;
 use App\Models\Farm;
 use App\Models\Visit;
+use App\Notifications\VisitStatusChanged;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -46,8 +47,12 @@ class VisitController extends Controller
             'status' => VisitStatus::Scheduled->value,
         ]);
 
+        $visit->load(['farm' => fn ($q) => $q->with(['nextVisit', 'client'])->withCount('openTasks')]);
+
+        $visit->farm->client?->notify(new VisitStatusChanged($visit, 'scheduled'));
+
         return response()->json([
-            'data' => new VisitResource($visit->load(['farm' => fn ($q) => $q->with(['nextVisit', 'client'])->withCount('openTasks')])),
+            'data' => new VisitResource($visit),
         ], 201);
     }
 
@@ -71,8 +76,12 @@ class VisitController extends Controller
             'completed_at' => now(),
         ]);
 
+        $visit->load(['farm' => fn ($q) => $q->with(['nextVisit', 'client'])->withCount('openTasks')]);
+
+        $visit->farm->client?->notify(new VisitStatusChanged($visit, 'completed'));
+
         return response()->json([
-            'data' => new VisitResource($visit->load(['farm' => fn ($q) => $q->with(['nextVisit', 'client'])->withCount('openTasks')])),
+            'data' => new VisitResource($visit),
         ]);
     }
 
@@ -82,8 +91,12 @@ class VisitController extends Controller
 
         $visit->update(['status' => VisitStatus::Cancelled->value]);
 
+        $visit->load(['farm' => fn ($q) => $q->with(['nextVisit', 'client'])->withCount('openTasks')]);
+
+        $visit->farm->client?->notify(new VisitStatusChanged($visit, 'cancelled'));
+
         return response()->json([
-            'data' => new VisitResource($visit->load(['farm' => fn ($q) => $q->with(['nextVisit', 'client'])->withCount('openTasks')])),
+            'data' => new VisitResource($visit),
         ]);
     }
 

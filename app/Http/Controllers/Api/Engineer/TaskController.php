@@ -12,6 +12,7 @@ use App\Http\Resources\TaskSubmissionResource;
 use App\Models\Farm;
 use App\Models\FarmTask;
 use App\Notifications\TaskApproved;
+use App\Notifications\TaskCreated;
 use App\Notifications\TaskRejected;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -47,6 +48,8 @@ class TaskController extends Controller
             'created_by' => $request->user()->id,
             'status' => TaskStatus::Pending->value,
         ]);
+
+        $task->farm->client?->notify(new TaskCreated($task));
 
         return response()->json(['data' => new TaskResource($task->load(['farm' => fn ($q) => $q->with('nextVisit')->withCount('openTasks')]))], 201);
     }
