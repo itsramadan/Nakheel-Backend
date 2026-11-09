@@ -92,7 +92,7 @@ Accept: application/json
 ```json
 {
   "id": "uuid",
-  "type": "evidence_submitted",   // أو task_approved | task_rejected
+  "type": "evidence_submitted",
   "title": "دليل جديد على: تقليم السعف الجاف وإزالة البقايا",
   "body": "مزرعة الروضة",
   "data": { "task_id": 4, "farm_id": 1 },
@@ -100,6 +100,58 @@ Accept: application/json
   "created_at": "2026-08-18T10:00:00+00:00"
 }
 ```
+
+كل إشعار بيتسجل في جدول `notifications` (قناة `database`) **وكمان** بيتبعت push فعلي
+عن طريق Firebase (قناة `fcm`) لو الموبايل عنده `fcm_token` محفوظ *و* Firebase
+متظبط على السيرفر (شوف "تفعيل Firebase Push" تحت). لو Firebase مش متظبط، الإشعار
+بيتسجل في الداتابيز عادي بس من غير push - مفيش error.
+
+### كل أنواع الإشعارات (`type`)
+
+**للمزارع (Client):**
+| type | إمتى بيتبعت |
+|---|---|
+| `task_created` | المهندس ضاف تاسك جديد على مزرعته |
+| `task_due_soon` | تاسك معاده بكرة ولسه معلّق (تذكير يومي - scheduler) |
+| `task_overdue` | تاسك فات معاده (يوم بعد الاستحقاق - scheduler) |
+| `task_approved` | المهندس اعتمد التاسك |
+| `task_rejected` | المهندس رفض الدليل المرسل (محتاج محاولة جديدة) |
+| `visit_scheduled` | اتحددت زيارة جديدة |
+| `visit_completed` | تمت الزيارة |
+| `visit_cancelled` | اتلغت الزيارة |
+| `visit_upcoming` | زيارة المهندس بكرة (تذكير يومي - scheduler) |
+| `subscription_renewal_due` | اشتراك المزرعة هيتجدد بعد ٣ أيام (scheduler) |
+
+**للمهندس (User):**
+| type | إمتى بيتبعت |
+|---|---|
+| `evidence_submitted` | المزارع رفع دليل تنفيذ تاسك (بانتظار المراجعة) |
+| `task_overdue_engineer` | تاسك عند أحد عملائه فات معاده (scheduler) |
+| `visit_upcoming` | عنده زيارة مجدولة بكرة (scheduler) |
+| `subscription_renewal_due` | اشتراك مزرعة عميل هيتجدد بعد ٣ أيام (scheduler) |
+
+### تذكيرات الـ scheduler (يومية)
+
+الحالات المعلّم عليها "scheduler" فوق بتتبعت عن طريق أمر واحد:
+```
+php artisan notifications:send-reminders
+```
+متسجّل في `routes/console.php` إنه يتشغل يوميًا الساعة ٨ الصبح. **عشان يشتغل فعليًا
+على السيرفر لازم تضيف cron entry واحد بس** (مرة واحدة، مش لكل أمر):
+```
+* * * * * cd /path-to-project && php artisan schedule:run >> /dev/null 2>&1
+```
+(اللي بيحصل: الكرون بيشغل Laravel كل دقيقة، وLaravel نفسه بيقرر إمتى ينفذ أي أمر مجدول - زي الأمر بتاعنا اللي شغال مرة واحدة الساعة ٨ بس).
+
+### تفعيل Firebase Push (FCM)
+
+١. ملف `storage/app/firebase/firebase-credentials.json` (service account JSON من Firebase Console) - **لازم يترفع يدويًا على السيرفر، مش عن طريق git** (الملف ده سري ومستبعد من `.gitignore` عمدًا).
+٢. `composer require kreait/firebase-php` (مكتبة إرسال FCM - لازم تتضاف للـ `composer.json`/`composer.lock` من على جهاز معاه إنترنت عادي وتتعمله `composer install` على السيرفر).
+٣. من غير أي env إضافي، النظام بيدوّر على الملف تلقائيًا في المسار اللي فوق (`config/services.php` → `firebase.credentials`). لو حابب تحطه في مكان تاني، ضيف في `.env`:
+```
+FIREBASE_CREDENTIALS=/full/path/to/firebase-credentials.json
+```
+لو الملف مش موجود، الـ push بيتوقف تلقائيًا من غير أي error (الإشعارات لسه بتتسجل في الداتابيز عادي).
 
 ---
 
